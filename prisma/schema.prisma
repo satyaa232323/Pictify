@@ -31,7 +31,7 @@ model Pin {
   id String @id @default(cuid())
   title String
   imageUrl String
-  description String?
+  description String
   userId String
   user  User @relation("UserPins", fields: [userId], references: [id])
   saves Save[] @relation("SavedPins")

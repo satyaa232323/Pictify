@@ -6,6 +6,7 @@
 .pnp.js
 .yarn/install-state.gz
 
+
 # testing
 /coverage
 
@@ -27,6 +28,10 @@ yarn-error.log*
 
 # local env files
 .env*.local
+<<<<<<< HEAD
+=======
+.env
+>>>>>>> babfa05362b4b4abcc60a0acfbac4ad16d53fbcb
 
 # vercel
 .vercel
@@ -34,5 +39,8 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+<<<<<<< HEAD
 
 /lib/generated/prisma
+=======
+>>>>>>> babfa05362b4b4abcc60a0acfbac4ad16d53fbcb

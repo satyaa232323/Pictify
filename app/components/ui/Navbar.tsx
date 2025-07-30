@@ -57,7 +57,7 @@ export const Navbar = async () => {
                                             <DropdownMenuSeparator />
                                             <DropdownMenuGroup>
                                                 <DropdownMenuItem asChild>
-                                                    <Link href="/profile" className="flex items-center space-x-2">
+                                                    <Link href="/profile/post" className="flex items-center space-x-2">
                                                         <User className="w-4 h-4" />
                                                         <span>Profile</span>
                                                     </Link>

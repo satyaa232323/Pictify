@@ -2,17 +2,20 @@
 import Image from "next/image";
 import { useEffect, useState } from "react";
 import ImageCard from "@/components/ImageCard";
+import { ImageCardProps } from '@/lib/lib';
+
 
 export default function Home() {
-  const [pins, setPins] = useState([]);
+  const [pins, setPins] = useState<ImageCardProps[]>([]);
 
   useEffect(() => {
     fetch('/api/pins')
-      .then(response => response.json())
-      .then(data => setPins(data))
-      .catch(error => {
-        console.error('Error fetching pins:', error);
-      });
+      .then((res) => res.json())
+      .then((data) => {
+        setPins(data);
+        console.log('Fetched pins:', data);
+      })
+      .catch((err) => console.error('Error fetching pins:', err));
   }, []);
 
   return (
@@ -22,7 +25,8 @@ export default function Home() {
           <ImageCard
             key={pin.id}
             id={pin.id}
-            src={pin.imageUrl}
+            imageUrl={pin.imageUrl}
+            src={pin.src || pin.imageUrl}
             title={pin.title}
             alt={pin.description || "Image Pin"}
             description={pin.user?.name}

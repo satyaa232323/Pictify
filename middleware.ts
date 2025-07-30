@@ -4,6 +4,8 @@ const isPublicRoute = createRouteMatcher([
   '/',            // Dashboard umum/landing page
   '/auth/sign-in(.*)', // Halaman sign-in + child routes
   '/auth/sign-up(.*)', // Halaman sign-up + child routes'
+  '/api/pins', // <-- tambahkan ini agar /api/pins public
+
 ])
 
 export default clerkMiddleware(async (auth, req) => {

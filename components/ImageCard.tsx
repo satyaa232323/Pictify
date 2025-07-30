@@ -2,26 +2,19 @@ import React from 'react'
 import { BlurFade } from './magicui/blur-fade';
 import Image from 'next/image';
 import Link from 'next/link';
+import { ImageCardProps } from '@/lib/lib';
 
 
-interface ImageCardProps {
-    id: string;
-    src: string;
-    alt: string;
-    title?: string;
-    description?: string;
-    delay?: number;
-}
 
 
-const ImageCard = ({ src, alt, title, description, delay = 0, id }: ImageCardProps) => {
+const ImageCard = ({ alt, title, imageUrl, src, description, delay = 0, id,  }: ImageCardProps) => {
     return (
         <BlurFade delay={delay} className='break-inside-avoid mb-4'>
             <Link href={`/pins/${id}`}>
             <div className='bg-white rouded-x1 overflow-hidden shadow-sm hover:shadow-lg transition-shadow duration-300 cursor-pointer group'>
                 <div className='relative overflow-hidden'>
                     <Image
-                        src={src}
+                        src={src || imageUrl}
                         width={300}
                         height={400}
                         alt={alt}
@@ -45,7 +38,6 @@ const ImageCard = ({ src, alt, title, description, delay = 0, id }: ImageCardPro
                         )}
                     </div>
                 )}
-
             </div>
             </Link>
         </BlurFade>

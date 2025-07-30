@@ -19,7 +19,9 @@ export const Navbar = async () => {
             {/* Header */}
             <header className="flex items-center justify-between p-4 bg-white shadow-sm">
                 <div className="flex items-center space-x-4">
-                    <h1 className="text-xl font-bold text-red-600">Pictify</h1>
+                    <Link href="/">
+                        <h1 className="text-xl font-bold text-red-600">Pictify</h1>
+                    </Link>
                 </div>
                 <div className="flex-1 max-w-2xl mx-8">
                     <input

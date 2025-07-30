@@ -1,30 +1,34 @@
-import { div } from "motion/react-client";
+'use client';
 import Image from "next/image";
-import { DummyData } from "../data/DummyData";
+import { useEffect, useState } from "react";
 import ImageCard from "@/components/ImageCard";
 
-
-
-const image = {
-  src: 'images/placeholder.png',
-  alt: 'Placeholder Image',
-}
-
 export default function Home() {
+  const [pins, setPins] = useState([]);
+
+  useEffect(() => {
+    fetch('/api/pins')
+      .then(response => response.json())
+      .then(data => setPins(data))
+      .catch(error => {
+        console.error('Error fetching pins:', error);
+      });
+  }, []);
+
   return (
     <div className="p-6">
-      <div className="colums-2 md:columns-3 lg:colums-4 xl:colums-5 gap-4 space-y-4">
-        {DummyData.map((image, index) => (
+      <div className="columns-2 md:columns-3 lg:columns-4 xl:columns-5 gap-4 space-y-4">
+        {pins.map((pin, index) => (
           <ImageCard
-          key={image.id}
-          src={image.src}
-          title={image.title}
-          alt={image.alt}
-          description={image.author}
-          delay={index * 0.1} // Optional: stagger the animation"
+            key={pin.id}
+            id={pin.id}
+            src={pin.imageUrl}
+            title={pin.title}
+            alt={pin.description || "Image Pin"}
+            description={pin.user?.name}
+            delay={index * 0.1}
           />
         ))}
-
       </div>
     </div>
   );

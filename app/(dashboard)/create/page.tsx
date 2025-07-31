@@ -4,11 +4,14 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import Image from 'next/image';
+import { Router } from 'next/router';
 import React, { useState } from 'react'
 import { toast } from 'sonner';
+import { useRouter } from 'next/navigation';
 
 const CreateContent = () => {
 
+ const router = useRouter();
   const [image, setImage] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [title, setTitle] = useState('');
@@ -23,6 +26,8 @@ const CreateContent = () => {
   };
 
   const handleSubmit = async () => {
+   
+   
     if (!image || !title) {
       toast.error('Image and title are required');
       return;
@@ -45,6 +50,8 @@ const CreateContent = () => {
         setDescription('');
         setImage(null);
         setPreviewUrl(null);
+        router.push('/');
+        
       } else {
         toast.error('Failed to create post');
       }

@@ -11,14 +11,14 @@ const ImageCard = ({ alt, title, imageUrl, src, description, delay = 0, id,  }: 
     return (
         <BlurFade delay={delay} className='break-inside-avoid mb-4'>
             <Link href={`/pins/${id}`}>
-            <div className='bg-white rouded-x1 overflow-hidden shadow-sm hover:shadow-lg transition-shadow duration-300 cursor-pointer group'>
+            <div className='bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-lg transition-shadow duration-300 cursor-pointer group'>
                 <div className='relative overflow-hidden'>
                     <Image
                         src={src || imageUrl}
                         width={300}
                         height={400}
                         alt={alt}
-                        className='w-full h-auto object-cover group-hover:scale-105 transition-transform duration-300'
+                        className='w-full h-auto object-cover group-hover:scale-105 transition-transform duration-300 rounded-sm'
                         sizes='(max-width: 640px) 100vw, (max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw'
                     />
                     <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-opacity duration-300" />

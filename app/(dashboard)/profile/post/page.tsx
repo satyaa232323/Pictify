@@ -1,48 +1,24 @@
-'use client';
-import ImageCard from '@/components/ImageCard'
-import { ImageCardProps } from '@/lib/lib';
-import React, { useEffect, useState } from 'react'
+import Content from '@/app/components/ui/Content'
+import { Button } from '@/components/ui/button'
+import Link from 'next/link'
+import React from 'react'
 
-
-
-const PostContent = () => {
-
-    const [pins, setPins] = useState<ImageCardProps[]>([]);
-
-    useEffect(() => {
-        fetch('/api/content')
-            .then(response => response.json())
-            .then(data => setPins(data))
-            .catch(error => {
-                console.error('Error fetching content:', error);
-            });
-    }, []);
-
-
-
+const PostPins = () => {
     return (
-        <div className="p-6">
-            <div className="columns-2 md:columns-3 lg:columns-4 xl:columns-5 gap-4 space-y-4">
-
-                {pins.length === 0 ? (
-                    <div className="col-span-full text-center">No content available</div>
-                ) : (
-                    pins.map((pin, index) => (
-                        <ImageCard
-                            key={pin.id}
-                            id={pin.id}
-                            imageUrl={pin.imageUrl}
-                            src={pin.src || pin.imageUrl}
-                            title={pin.title}
-                            alt={pin.description || "Image Pin"}
-                            description={pin.user?.name}
-                            delay={index * 0.1 || 0}
-                        />
-                    ))
-                )}
+        <div className="min-h-screen">
+            <div className='flex gap-4 mb-6'>
+                <Link href={'/create'}>
+                    <Button variant="default">Create Post</Button>
+                </Link>
+             
             </div>
+            <div className=''>
+                <h1 className="text-2xl font-bold mb-1">My Posts</h1>
+                <p className="text-gray-600 mb-4">Here are the posts you have created.</p>
+            </div>
+            <Content endpoint="/api/pins/me" />
         </div>
     )
 }
 
-export default PostContent
+export default PostPins

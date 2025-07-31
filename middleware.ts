@@ -1,18 +1,36 @@
-import {  clerkMiddleware, createRouteMatcher } from '@clerk/nextjs/server';
+import { clerkMiddleware, createRouteMatcher } from '@clerk/nextjs/server';
+import { NextResponse } from 'next/server';
 
 const isPublicRoute = createRouteMatcher([
   '/',            // Dashboard umum/landing page
   '/auth/sign-in(.*)', // Halaman sign-in + child routes
   '/auth/sign-up(.*)', // Halaman sign-up + child routes'
-  '/api/pins', // <-- tambahkan ini agar /api/pins public
+  '/api/pins(.*)',    // semua route di bawah /api/pins jadi public
 
 ])
 
 export default clerkMiddleware(async (auth, req) => {
-  if (!isPublicRoute(req)){
-   await auth.protect()
-  } 
+  const { userId } = await auth();
+  const path = req.nextUrl.pathname;
+
+  if (!isPublicRoute(req)) {
+    await auth.protect()
+  }
+
+
+  // Auto-redirect kalau user sudah login
+
+  if (
+    userId &&
+    (path.startsWith('/auth/sign-in') || path.startsWith('/auth/sign-up'))
+  ) {
+    return NextResponse.redirect(new URL('/', req.url));
+  }
+
+  
 })
+
+
 
 
 export const config = {

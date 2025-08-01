@@ -50,7 +50,7 @@ const CreateContent = () => {
         setDescription('');
         setImage(null);
         setPreviewUrl(null);
-        router.push('/');
+        router.push('/profile/post');
         
       } else {
         toast.error('Failed to create post');

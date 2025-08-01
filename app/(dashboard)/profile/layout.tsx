@@ -8,7 +8,7 @@ import React from 'react'
 export default function LayoutProfile({ children }: { children: React.ReactNode }) {
   const tabs = [
     { name: 'My Content', href: '/profile/post' },
-    { name: 'Saves', href: '/profile/saves/3' },
+    { name: 'Saves', href: '/profile/saves' },
   ]
 
   const pathname = usePathname()

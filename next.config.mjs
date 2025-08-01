@@ -8,6 +8,10 @@ const nextConfig = {
             },
             {
                 protocol: 'https',
+                hostname: 'i.pinimg.com',
+            },  
+            {
+                protocol: 'https',
                 hostname: 'images.unsplash.com',
             },
             {
@@ -33,6 +37,10 @@ const nextConfig = {
             {
                 protocol: 'https',
                 hostname: 'source.unsplash.com',
+            },
+            {
+                protocol: 'https',
+                hostname: 'via.placeholder.com',
             }
         ],
     },

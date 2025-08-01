@@ -45,7 +45,7 @@ model Save {
   id String @id @default(cuid())
   user User @relation(fields: [userId], references: [id])
   userId String
-  pin Pin @relation("SavedPins", fields: [pinId], references: [id])
+  pin Pin @relation("SavedPins", fields: [pinId], references: [id], onDelete: Cascade)
   pinId String
   savedAt DateTime @default(now())
 
@@ -66,7 +66,7 @@ model BoardPin {
   boardId String
   pinId String
   board Board @relation(fields: [boardId], references: [id])
-  pin Pin @relation(fields: [pinId], references: [id])
+  pin Pin @relation(fields: [pinId], references: [id], onDelete: Cascade)
 
   @@unique([boardId, pinId])
 }

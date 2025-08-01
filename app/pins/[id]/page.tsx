@@ -2,6 +2,8 @@
 import React, { useEffect, useState } from 'react'
 
 import { useParams } from 'next/navigation'
+import { Button } from '@/components/ui/button';
+import { toast } from 'sonner';
 interface PinDetail {
   id: string;
   title: string;
@@ -25,6 +27,9 @@ const Pin = () => {
   const [pin, setPin] = useState<PinDetail | null>(null);
   const [loading, setLoading] = useState(true);
 
+  const [saves, setSaves] = useState<PinDetail['saves']>([]);
+  const [isSaved, setIsSaved] = useState(false);
+
 
   useEffect(() => {
     const fetchPin = async () => {
@@ -36,6 +41,7 @@ const Pin = () => {
 
         const data = await res.json();
         setPin(data);
+        setSaves(data.saves || []);
       }
       catch (error) {
         console.error("Error fetching pin:", error);
@@ -48,6 +54,39 @@ const Pin = () => {
   }
     , [id]);
 
+  const handleSave = async () => {
+    if (!pin?.id) return
+    setIsSaved(true)
+
+    try {
+      const res = await fetch(`/api/save`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ pinId: pin.id })
+      });
+
+
+      if (!res.ok) {
+        const errorData = await res.json();
+        throw new Error(errorData.error || 'Failed to save pin');
+        return;
+      }
+
+      const data = await res.json();
+      setSaves((prev) => [...prev, data]);
+      setIsSaved(true);
+      toast.success('Pin saved successfully!');
+    }
+    catch (error) {
+      toast.error('Failed to save pin');
+      setIsSaved(false);
+    }
+  }
+
+
+  const alreadySaved = saves.some((s) => s.user?.name && s.user.name === pin?.user.name)
 
   if (loading) return <div className="p-6">Loading...</div>
   if (!pin) return <div className="p-6 text-red-600">Pin not found</div>
@@ -61,9 +100,20 @@ const Pin = () => {
           alt={pin.title}
           className="rounded-xl w-full object-cover"
         />
-        <h1 className="text-3xl font-bold mt-4">{pin.title}</h1>
-        <p className="text-gray-600 mt-2">{pin.description}</p>
+        <div className="flex justify-between items-start">
+          <div>
+            <h1 className="text-2xl font-bold mt-4">{pin.title}</h1>
+            <p className="text-gray-600 mt-2">{pin.description}</p>
+          </div>
+          <div>
 
+            {!alreadySaved && (
+              <Button onClick={handleSave} className="mt-4" variant="default" disabled={isSaved}>
+                {isSaved ? 'Saving...' : 'Save'}
+              </Button>
+            )}
+          </div>
+        </div>
         <div className="flex items-center gap-3 mt-4">
           <img
             src={pin.user.image}

@@ -1,23 +1,67 @@
 'use client';
 import ImageCard from '@/components/ImageCard'
 import { ImageCardProps } from '@/lib/lib';
+import { usePathname } from 'next/navigation';
 import React, { useEffect, useState } from 'react'
 
 type PostContentProps = {
     endpoint: string; // endpoint dinamis
 };
 
+
+interface SavedPin {
+    id: string,
+    savedAt: string,
+    pin: ImageCardProps;
+}
+
 const Content = ({ endpoint }: PostContentProps) => {
 
+
     const [pins, setPins] = useState<ImageCardProps[]>([]);
+    const [loading, setLoading] = useState(true);
     useEffect(() => {
         fetch(endpoint)
             .then(response => response.json())
-            .then(data => setPins(data))
+            .then(data => {
+                // jika endpoint saves
+                if (endpoint.includes('save')) {
+                    const extractedPins = data.map((save: SavedPin) => ({
+                        ...save.pin,
+                        id: save.pin.id,
+                        src: save.pin.imageUrl,
+                        title: save.pin.title,
+                        description: save.pin.description,
+                        user: save.pin.user,
+                    }));
+                    setPins(extractedPins);
+                    setLoading(false);
+                }
+                else {
+                    setPins(data);
+                    setLoading(false);
+                }
+            })
             .catch(error => {
                 console.error('Error fetching content:', error);
             });
     }, [endpoint]);
+
+    const handledelete = async (id: string) => {
+        try {
+            const response = await fetch(`/api/pins/${id}`, {
+                method: 'DELETE',
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to delete pin');
+            }
+
+            setPins(pins.filter(pin => pin.id !== id));
+        } catch (error) {
+            console.error('Error deleting pin:', error);
+        }
+    }
 
 
 
@@ -39,6 +83,8 @@ const Content = ({ endpoint }: PostContentProps) => {
                             description={pin.user?.name}
                             delay={index * 0.1}
                             user={pin.user}
+                            onDelete={handledelete}
+
                         />
                     ))
                 )}

@@ -10,7 +10,6 @@ const PostPins = () => {
                 <Link href={'/create'}>
                     <Button variant="default">Create Post</Button>
                 </Link>
-             
             </div>
             <div className=''>
                 <h1 className="text-2xl font-bold mb-1">My Posts</h1>

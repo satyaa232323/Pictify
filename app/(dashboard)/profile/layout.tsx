@@ -1,5 +1,6 @@
 'use client'
 
+import { Toaster } from '@/components/ui/sonner'
 import clsx from 'clsx'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
@@ -15,6 +16,10 @@ export default function LayoutProfile({ children }: { children: React.ReactNode 
 
   return (
     <div className="min-h-screen bg-gray-50">
+       <Toaster
+                duration={3000}
+                closeButton={false}
+            />
       <div className="p-6">
         <h1 className="text-4xl font-semibold">My Profile</h1>
         <p className="text-gray-500 mt-2">Manage your profile settings and preferences.</p>

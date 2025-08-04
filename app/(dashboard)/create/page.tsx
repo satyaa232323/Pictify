@@ -8,10 +8,11 @@ import { Router } from 'next/router';
 import React, { useState } from 'react'
 import { toast } from 'sonner';
 import { useRouter } from 'next/navigation';
+import { X } from 'lucide-react';
 
 const CreateContent = () => {
 
- const router = useRouter();
+  const router = useRouter();
   const [image, setImage] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [title, setTitle] = useState('');
@@ -26,8 +27,8 @@ const CreateContent = () => {
   };
 
   const handleSubmit = async () => {
-   
-   
+
+
     if (!image || !title) {
       toast.error('Image and title are required');
       return;
@@ -51,13 +52,18 @@ const CreateContent = () => {
         setImage(null);
         setPreviewUrl(null);
         router.push('/profile/post');
-        
+
       } else {
         toast.error('Failed to create post');
       }
     } catch (error) {
       toast.error('Something went wrong');
     }
+  };
+
+  const handleRemoveImage = () => {
+    setImage(null);
+    setPreviewUrl(null);
   };
 
 
@@ -69,36 +75,56 @@ const CreateContent = () => {
         {/* Add your form or content creation component here */}
       </div>
 
-      <div className="mt-6 space-y-4">
-        {/* Upload & Preview */}
-        {previewUrl ? (
-          <BlurFade delay={0.1} className="relative w-full aspect-[4/5]">
-            <Image
-              src={previewUrl}
-              alt="Preview"
-              fill
-              className="object-cover rounded-xl shadow-md"
-            />
-          </BlurFade>
-        ) : (
-          <Input type="file" accept="image/*" onChange={handleImageChange} className="cursor-pointer" />
-        )}
+      <div className="mt-6 flex flex-col md:flex-row gap-6">
+        {/* preview area */}
 
-        <Input
-          placeholder="Title"
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
-        />
+        <div className="w-full md:w-1/2 relative">
+          {previewUrl ? (
+            <div className="relative w-full aspect-[4/5] rounded-xl overflow-hidden shadow-md">
+              <Image
+                src={previewUrl}
+                alt="Preview"
+                fill
+                className="object-cover"
+              />
+              <Button
+                variant="destructive"
+                size="icon"
+                onClick={handleRemoveImage}
+                className="absolute top-2 right-2 z-10"
+              >
+                <X className="w-4 h-4" />
+              </Button>
+            </div>
+          ) : (
+            <div className="h-full flex items-center justify-center border rounded-xl p-4">
+              <Input
+                type="file"
+                accept="image/*"
+                onChange={handleImageChange}
+                className="cursor-pointer"
+              />
+            </div>
+          )}
+        </div>
 
-        <Textarea
-          placeholder="Write a short description..."
-          value={description}
-          onChange={(e) => setDescription(e.target.value)}
-        />
-
-        <Button onClick={handleSubmit} disabled={!image || !title}>
-          Publish Post
-        </Button>
+        {/* Form Area */}
+        <div className="w-full md:w-1/2 flex flex-col gap-4">
+          <Input
+            placeholder="Title"
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+          />
+          <Textarea
+            placeholder="Write a short description..."
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+            className="h-40"
+          />
+          <Button onClick={handleSubmit} disabled={!image || !title}>
+            Publish Post
+          </Button>
+        </div>
       </div>
     </div>
   )

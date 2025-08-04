@@ -1,9 +1,12 @@
 'use client'
 import React, { useEffect, useState } from 'react'
-
-import { useParams } from 'next/navigation'
+import { useParams, useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
+import { useAuth } from '@clerk/nextjs';
+import { Bookmark, BookmarkCheck, Loader2 } from 'lucide-react';
+import ImageCard from '@/components/ImageCard';
+
 interface PinDetail {
   id: string;
   title: string;
@@ -15,21 +18,34 @@ interface PinDetail {
   }
   saves: {
     user: {
-      name: string
+      name: string;
+      id: string;
     }
   }[]
 }
 
-
 const Pin = () => {
-
   const { id } = useParams();
+  const router = useRouter();
+  const { userId, isLoaded, isSignedIn } = useAuth();
+
   const [pin, setPin] = useState<PinDetail | null>(null);
   const [loading, setLoading] = useState(true);
-
   const [saves, setSaves] = useState<PinDetail['saves']>([]);
+  const [isSaving, setIsSaving] = useState(false);
   const [isSaved, setIsSaved] = useState(false);
+  const [otherPins, setOtherPins] = useState<PinDetail[]>([]);
 
+  useEffect(() => {
+    const checkSaveStatus = () => {
+      if (saves.length > 0 && userId) {
+        const saved = saves.some(save => save.user.id === userId);
+        setIsSaved(saved);
+      }
+    };
+
+    checkSaveStatus();
+  }, [saves, userId]);
 
   useEffect(() => {
     const fetchPin = async () => {
@@ -42,21 +58,53 @@ const Pin = () => {
         const data = await res.json();
         setPin(data);
         setSaves(data.saves || []);
+
+
+
+        // fetch other pins
+        const otherRes = await fetch(`/api/pins`);
+        if (!otherRes.ok) {
+          throw new Error('Failed to fetch other pins');
+        }
+
+        const allPins = await otherRes.json();
+        const filteredPins = allPins.filter((p: PinDetail) => p.id !== id);
+        setOtherPins(filteredPins);
       }
       catch (error) {
         console.error("Error fetching pin:", error);
+        toast.error('Failed to load pin');
       }
       finally {
         setLoading(false);
       }
     }
+
     if (id) fetchPin();
-  }
-    , [id]);
+  }, [id]);
+
+  useEffect(() => {
+    if (saves.length > 0 && userId) {
+      const saved = saves.some(save => save.user.id === userId);
+      setIsSaved(saved);
+    }
+  }, [saves, userId]);
 
   const handleSave = async () => {
-    if (!pin?.id) return
-    setIsSaved(true)
+    if (!isSignedIn) {
+      toast.error('Please sign in to save pins', {
+        duration: 3000,
+        action: {
+          label: "Sign In",
+          onClick: () => router.push('/auth/sign-in')
+        }
+      });
+      return;
+    }
+
+    if (!pin?.id || isSaving || isSaved) return;
+
+    setIsSaving(true);
 
     try {
       const res = await fetch(`/api/save`, {
@@ -67,34 +115,64 @@ const Pin = () => {
         body: JSON.stringify({ pinId: pin.id })
       });
 
+      const data = await res.json();
 
       if (!res.ok) {
-        const errorData = await res.json();
-        throw new Error(errorData.error || 'Failed to save pin');
-        return;
+        throw new Error(data.error || 'Failed to save pin');
       }
 
-      const data = await res.json();
-      setSaves((prev) => [...prev, data]);
+      // Update local state with new save
+      setSaves(prev => [...prev, {
+        user: {
+          id: userId as string,
+          name: data.user?.name || 'You'
+        }
+      }]);
       setIsSaved(true);
       toast.success('Pin saved successfully!');
     }
-    catch (error) {
-      toast.error('Failed to save pin');
-      setIsSaved(false);
+    catch (error: any) {
+      toast.error(error.message || 'Failed to save pin');
     }
-  }
+    finally {
+      setIsSaving(false);
+    }
+  };
 
+  const handleUnsave = async () => {
+    if (!pin?.id || isSaving || !isSaved) return;
 
-  const alreadySaved = saves.some((s) => s.user?.name && s.user.name === pin?.user.name)
+    setIsSaving(true);
 
-  if (loading) return <div className="p-6">Loading...</div>
-  if (!pin) return <div className="p-6 text-red-600">Pin not found</div>
+    try {
+      const res = await fetch(`/api/save/${pin.id}`, {
+        method: 'DELETE'
+      });
+
+      if (!res.ok) {
+        throw new Error('Failed to unsave pin');
+      }
+
+      // Remove save from local state
+      setSaves(prev => prev.filter(save => save.user.id !== userId));
+      setIsSaved(false);
+      toast.success('Pin removed from saves');
+    }
+    catch (error) {
+      toast.error('Failed to remove pin from saves');
+    }
+    finally {
+      setIsSaving(false);
+    }
+  };
+
+  if (!isLoaded) return null;
+  if (loading) return <div className="p-6">Loading...</div>;
+  if (!pin) return <div className="p-6 text-red-600">Pin not found</div>;
 
   return (
-    <div className="p-6 flex flex-col lg:flex-row gap-10">
-      {/* Gambar */}
-      <div className="w-full lg:w-2/3">
+    <div className="p-6 columns-1 sm:columns-2 md:columns-3 lg:columns-2 gap-4 space-y-4">
+      <div className="break-inside-avoid mb-4 bg-white rounded-xl shadow-sm overflow-hidden ">
         <img
           src={pin.imageUrl}
           alt={pin.title}
@@ -106,10 +184,43 @@ const Pin = () => {
             <p className="text-gray-600 mt-2">{pin.description}</p>
           </div>
           <div>
-
-            {!alreadySaved && (
-              <Button onClick={handleSave} className="mt-4" variant="default" disabled={isSaved}>
-                {isSaved ? 'Saving...' : 'Save'}
+            {isSaved ? (
+              <Button
+                onClick={handleUnsave}
+                className="mt-4"
+                variant="destructive"
+                disabled={isSaving}
+              >
+                {isSaving ? (
+                  <>
+                    <Loader2 className="animate-spin mr-2 h-4 w-4" />
+                    Removing...
+                  </>
+                ) : (
+                  <>
+                    <BookmarkCheck className="mr-2 h-4 w-4" />
+                    Saved
+                  </>
+                )}
+              </Button>
+            ) : (
+              <Button
+                onClick={handleSave}
+                className="mt-4"
+                variant="outline"
+                disabled={isSaving}
+              >
+                {isSaving ? (
+                  <>
+                    <Loader2 className="animate-spin mr-2 h-4 w-4" />
+                    Saving...
+                  </>
+                ) : (
+                  <>
+                    <Bookmark className="mr-2 h-4 w-4" />
+                    Save
+                  </>
+                )}
               </Button>
             )}
           </div>
@@ -124,21 +235,27 @@ const Pin = () => {
         </div>
       </div>
 
-      {/* Sidebar (optional) */}
-      <div className="w-full lg:w-1/3">
-        <div className="bg-white rounded-lg p-4 shadow">
-          <h2 className="font-semibold text-lg mb-2">Saved by</h2>
-          {pin.saves.length > 0 ? (
-            <ul className="list-disc pl-4 text-sm">
-              {pin.saves.map((save, index) => (
-                <li key={index}>{save.user.name}</li>
-              ))}
-            </ul>
-          ) : (
-            <p className="text-gray-500 text-sm">No one has saved this pin yet.</p>
-          )}
+
+      {otherPins.length > 0 && (
+        <div>
+          <h2 className='text-xl font-semibold mb-4'>Other Pins You Might Like</h2>
+          <div className='columns-1 sm:columns-2 md:columns-3 lg:columns-2 gap-4 space-y-4'>
+            {otherPins.map((item, index) => (
+              <ImageCard
+                key={item.id}
+                id={item.id}
+                alt={item.title}
+                title={item.title}
+                imageUrl={item.imageUrl}
+                src={item.imageUrl}
+                delay={index * 0.1}
+
+              />
+            ))}
+          </div>
         </div>
-      </div>
+
+      )}
     </div>
   )
 }

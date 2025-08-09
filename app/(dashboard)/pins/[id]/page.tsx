@@ -167,7 +167,7 @@ const Pin = () => {
   };
 
   if (!isLoaded) return null;
-  if (loading) return <div className="p-6">Loading...</div>;
+  if (loading) return <div className=" w-full flex justify-center items-center mt-14"><Loader2 className='animate-spin text-lg text-red-600' /></div>;
   if (!pin) return <div className="p-6 text-red-600">Pin not found</div>;
 
   return (
@@ -248,6 +248,7 @@ const Pin = () => {
                 title={item.title}
                 imageUrl={item.imageUrl}
                 src={item.imageUrl}
+                description={item.user?.name}
                 delay={index * 0.1}
 
               />

@@ -8,7 +8,7 @@ export async function GET(request: Request, { params }: { params: { id: string }
         const pin = await prisma.pin.findUnique({
             where: { id: params.id },
             include: {
-                user: {
+            user: {
                     select: {
                         id: true,
                         name: true,

@@ -1,19 +1,35 @@
+'use client'
 import { Button } from '@/components/ui/button'
 import { DropdownMenuGroup } from '@/components/ui/dropdown-menu'
-import { GetUserClerk } from '@/lib/auth'
+import { useUser, SignedIn, SignedOut, SignInButton, SignOutButton, UserButton, ClerkLoading, ClerkLoaded } from '@clerk/nextjs'
 import Link from 'next/link'
-import { ClerkLoaded, ClerkLoading, SignedIn, SignedOut, SignInButton, SignOutButton, SignUpButton, UserButton } from '@clerk/nextjs'
 import { DropdownMenu, DropdownMenuCheckboxItem, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
 import { Loader2, LogOut, Monitor, Moon, Settings, Sun, User } from 'lucide-react'
-import React from 'react'
+import React, { useEffect, useState } from 'react'
+import { useRouter } from 'next/navigation'
 
 
-export const Navbar = async () => {
+export const Navbar = () => {
     // Ensure user is authenticated before rendering the navbar
-    const user = await GetUserClerk()
+
+    const { user, isLoaded } = useUser()
+    const [query, setQuery] = useState('');
+    const router = useRouter();
 
 
-    await GetUserClerk()
+    const handleSearch = (e: React.FormEvent) => {
+        e.preventDefault();
+        if (query.trim()) {
+            router.push(`/pins?search=${encodeURIComponent(query.trim())}`)
+        } else {
+            router.push('/pins');
+        }
+    }
+
+    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setQuery(e.target.value);
+    }
+
     return (
         <div>
             {/* Header */}
@@ -24,11 +40,16 @@ export const Navbar = async () => {
                     </Link>
                 </div>
                 <div className="flex-1 max-w-2xl mx-8">
-                    <input
-                        type="text"
-                        placeholder="Search for ideas"
-                        className="w-full px-4 py-2 bg-gray-100 rounded-full border-none outline-none focus:bg-white focus:shadow-md"
-                    />
+                    <form onSubmit={handleSearch}>
+                        <input
+                            value={query}
+                            onChange={handleInputChange}
+                            type="text"
+                            placeholder="Search for ideas"
+                            className="w-full px-4 py-2 bg-gray-100 rounded-full border-none outline-none focus:bg-white focus:shadow-md"
+                        />
+                    </form>
+
                 </div>
                 <div className="flex gap-4">
                     <div className='flex items-center space-x-2'>
@@ -43,14 +64,14 @@ export const Navbar = async () => {
                                         <DropdownMenuTrigger asChild>
                                             <Button variant="ghost" className="flex items-center space-x-2">
                                                 <UserButton />
-                                                <span>{user?.name || user?.email}</span>
+                                                <span>{user?.fullName || user?.emailAddresses?.[0]?.emailAddress}</span>
                                             </Button>
                                         </DropdownMenuTrigger>
                                         <DropdownMenuContent className="w-56 " align='end' forceMount>
                                             <DropdownMenuLabel className='font-normal'>
                                                 <div className="flex flex-col space-y-1">
                                                     <p className="text-sm font-medium leading-none">
-                                                        {user?.name}
+                                                        {user?.fullName}
                                                     </p>
                                                 </div>
                                             </DropdownMenuLabel>
@@ -101,17 +122,11 @@ export const Navbar = async () => {
                         </SignedIn>
                         <SignedOut>
                             <div className="flex items-center space-x-2">
-
-
-
-
                                 <Button size="lg" variant="outline">
                                     <Link href='/auth/sign-in'>
                                         Sign in
                                     </Link>
                                 </Button>
-
-
                                 <Button size="lg">
                                     <Link href='/auth/sign-up'>
                                         Sign Up

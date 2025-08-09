@@ -16,10 +16,10 @@ export default function LayoutProfile({ children }: { children: React.ReactNode 
 
   return (
     <div className="min-h-screen bg-gray-50">
-       <Toaster
-                duration={3000}
-                closeButton={false}
-            />
+      <Toaster
+        duration={3000}
+        closeButton={false}
+      />
       <div className="p-6">
         <h1 className="text-4xl font-semibold">My Profile</h1>
         <p className="text-gray-500 mt-2">Manage your profile settings and preferences.</p>
@@ -29,18 +29,18 @@ export default function LayoutProfile({ children }: { children: React.ReactNode 
           {tabs.map((tab) => {
             const isActive = pathname === tab.href
             return (
-              <Link
+                <Link
                 key={tab.name}
                 href={tab.href}
                 className={clsx(
                   'px-6 py-2 rounded-full text-lg font-semibold border transition duration-150',
                   isActive
-                    ? 'text-black border-blue-500 underline underline-offset-4 decoration-[2.5px]'
-                    : 'text-gray-500 border-transparent hover:text-black hover:border-gray-300'
+                  ? 'text-white border-red-600 bg-red-600'
+                  : 'text-gray-500 border-transparent hover:text-red-500 hover:border-red-200'
                 )}
-              >
+                >
                 {tab.name}
-              </Link>
+                </Link>
             )
           })}
         </div>

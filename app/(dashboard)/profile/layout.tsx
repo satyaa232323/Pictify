@@ -10,6 +10,7 @@ export default function LayoutProfile({ children }: { children: React.ReactNode 
   const tabs = [
     { name: 'My Content', href: '/profile/post' },
     { name: 'Saves', href: '/profile/saves' },
+    { name: 'Boards', href: '/profile/boards' }
   ]
 
   const pathname = usePathname()

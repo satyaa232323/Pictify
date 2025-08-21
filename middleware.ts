@@ -9,10 +9,22 @@ const isPublicRoute = createRouteMatcher([
 
 ])
 
+
+const isProtectedRoute = createRouteMatcher([
+  '/pins(.+)',
+  '/profile(.*)',
+  '/create(.*)',
+])
+
 export default clerkMiddleware(async (auth, req) => {
   const { userId } = await auth();
   const path = req.nextUrl.pathname;
 
+  if (!isPublicRoute(req) && !userId) {
+    return NextResponse.redirect(new URL('/auth/sign-in', req.url));
+  }
+
+  // protect routes
   if (!isPublicRoute(req)) {
     await auth.protect()
   }
@@ -26,8 +38,8 @@ export default clerkMiddleware(async (auth, req) => {
   ) {
     return NextResponse.redirect(new URL('/', req.url));
   }
-
   
+
 })
 
 

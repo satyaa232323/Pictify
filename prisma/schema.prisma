@@ -36,7 +36,7 @@ model Pin {
   user  User @relation("UserPins", fields: [userId], references: [id])
   saves Save[] @relation("SavedPins")
   boards BoardPin[]
-
+  
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }

@@ -8,8 +8,7 @@ type PostContentProps = {
     endpoint: string; // endpoint dinamis
 };
 
-
-interface SavedPin {
+export interface SavedPin {
     id: string,
     savedAt: string,
     pin: ImageCardProps;
@@ -84,7 +83,7 @@ const Content = ({ endpoint }: PostContentProps) => {
                             delay={index * 0.1}
                             user={pin.user}
                             onDelete={handledelete}
-
+                            
                         />
                     ))
                 )}

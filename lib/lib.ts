@@ -7,6 +7,7 @@ export interface ImageCardProps {
     description?: string;       // Deskripsi singkat
     delay?: number;             // Digunakan untuk animasi
     onDelete?: (id: string) => void; // Callback untuk menghapus pin
+    isSelected?: boolean;
     user?: {
         id: string;
         name: string;

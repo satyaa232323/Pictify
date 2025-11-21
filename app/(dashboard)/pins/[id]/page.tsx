@@ -131,8 +131,10 @@ const Pin = () => {
       setIsSaved(true);
       toast.success('Pin saved successfully!');
     }
-    catch (error: any) {
-      toast.error(error.message || 'Failed to save pin');
+    catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'Failed to load pin';
+      console.error("Error fetching pin:", error);
+      toast.error(errorMessage);
     }
     finally {
       setIsSaving(false);

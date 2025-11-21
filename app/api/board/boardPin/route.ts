@@ -54,10 +54,12 @@ export async function POST(request: Request) {
         return new Response(JSON.stringify(postPinBoard), { status: 200 });
 
 
-    } catch (error: any) {
-        if (error.code === 'P2002') {
+    } catch (error: unknown) {
+          // Type guard for Prisma error
+        if (error && typeof error === 'object' && 'code' in error && error.code === 'P2002') {
             return new Response("Pin is already added to this board", { status: 409 });
         }
+        console.error("Error adding pin to board:", error);
         return new Response("Internal Server Error", { status: 500 });
     }
 }

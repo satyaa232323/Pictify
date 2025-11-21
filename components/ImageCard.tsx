@@ -7,21 +7,27 @@ import Link from 'next/link';
 import { ImageCardProps } from '@/lib/lib';
 import { usePathname } from 'next/navigation';
 import { BiDotsVerticalRounded } from 'react-icons/bi';
+import { Checkbox } from './ui/checkbox';
 
 
 
-const ImageCard = ({ alt, title, imageUrl, src, description, delay = 0, id, onDelete, }: ImageCardProps) => {
+const ImageCard = ({ alt, title, imageUrl, src, description, delay = 0, id, onDelete, isSelected }: ImageCardProps) => {
 
     // add optional handledelete submit when isContentProfile
     const pathname = usePathname();
     const isProfilePost = pathname.startsWith('/profile/post');
+    // const isBoardPost = pathname.startsWith('/profile/board/post');
 
     const handleDeleteClick = async () => {
         if (confirm('Are you sure you want to delete this post?')) {
             onDelete?.(id);
         }
     }
-
+    
+    const handleSelectClick = async () => {
+        // Handle select click logic here
+        
+    }
     return (
         <BlurFade delay={delay} className='break-inside-avoid mb-4'>
             <div className='bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-lg transition-shadow duration-300 cursor-pointer group'>
@@ -60,7 +66,10 @@ const ImageCard = ({ alt, title, imageUrl, src, description, delay = 0, id, onDe
                     >
                         <BiDotsVerticalRounded className='text-gray-500 font-bold text-[20px]' />
                     </button>
-                )}
+                ) }
+                {/* {isBoardPost && (
+                    <Checkbox  onToggle={handleSelectClick}/>
+                )} */}
             </div>
         </BlurFade >
     )

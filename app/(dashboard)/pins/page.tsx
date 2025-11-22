@@ -2,10 +2,10 @@
 
 import ImageCard from '@/components/ImageCard';
 import { ImageCardProps } from '@/lib/lib';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 
-const Pins = () => {
+const PinsContent = () => {
   const [pins, setPins] = useState<ImageCardProps[]>([]);
   const [filteredPins, setFilteredPins] = useState<ImageCardProps[]>([]);
   const searchParams = useSearchParams();
@@ -37,7 +37,7 @@ const Pins = () => {
         <div className="mb-4">
           <h4 className="text-2xl font-semibold">Search for "{searchQuery}"</h4>
           <p className="text-gray-500 ">results {filteredPins.length}</p>
-        
+
         </div>
       )}
 
@@ -66,6 +66,14 @@ const Pins = () => {
         )}
       </div>
     </div>
+  );
+};
+
+const Pins = () => {
+  return (
+    <Suspense fallback={<div className="p-6 text-center">Loading...</div>}>
+      <PinsContent />
+    </Suspense>
   );
 };
 
